@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wellbeing — Mental Health Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+</head>
+<body>
+ 
+<!-- ── Theme toggle ── -->
+<button class="theme-toggle" id="themeBtn" title="Toggle light/dark mode" aria-label="Switch colour theme">🌙</button>
+ 
+<!-- ══════════════ TUTORIAL DOM ══════════════ -->
+<div class="tut-overlay" id="tutOverlay"></div>
+<div class="tut-welcome show" id="tutWelcome">
+  <div class="welcome-box">
+    <span class="welcome-icon">🌿</span>
+    <h2 class="welcome-h">Welcome to <em>Wellbeing</em></h2>
+    <p class="welcome-p">Your personal mental health companion. We'll take a quick tour of everything — what should we call you?</p>
+    <input class="welcome-inp" id="nameInput" type="text" placeholder="Your name…" maxlength="28" autocomplete="off">
+    <button class="welcome-go" id="startBtn">Start my tour →</button>
+    <br>
+    <button class="welcome-skip-link" id="skipWelcome">Skip — go straight to the dashboard</button>
+  </div>
+</div>
+<div class="tut-spot" id="tutSpot"></div>
+<div class="tut-tip" id="tutTip">
+  <div class="tut-step-label" id="tipStep"></div>
+  <span class="tut-emoji" id="tipEmoji"></span>
+  <div class="tut-title" id="tipTitle"></div>
+  <div class="tut-body" id="tipBody"></div>
+  <div class="tut-footer">
+    <button class="btn-end" id="tipEnd">End tour</button>
+    <div class="tut-dots" id="tipDots"></div>
+    <button class="btn-nxt" id="tipNext">Next →</button>
+  </div>
+</div>
+ 
+<!-- ══════════════ APP ══════════════ -->
+<div class="app">
+ 
+  <!-- HEADER -->
+  <div class="header" id="sec-header">
+    <div>
+      <h1 class="header-title">Your <span>wellbeing</span></h1>
+      <p class="header-sub">Week of Apr 18 – 24, 2026</p>
+    </div>
+    <div class="header-actions">
+      <div class="streak-badge"><span class="streak-dot"></span>14-day streak</div>
+      <button class="tour-start-btn" id="replayBtn">✦ Take the tour</button>
+    </div>
+  </div>
+ 
+  <!-- METRICS -->
+  <div class="metrics-grid" id="sec-metrics">
+    <div class="metric-card metric-accent">
+      <div class="metric-label">Avg mood</div>
+      <div class="metric-value">6.8<sup>/ 10</sup></div>
+      <div class="metric-delta delta-up">↑ +0.4 from last week</div>
+    </div>
+    <div class="metric-card metric-blue">
+      <div class="metric-label">Sleep avg</div>
+      <div class="metric-value">6.9<sup>hrs</sup></div>
+      <div class="metric-delta delta-warn">↓ Below 8hr goal</div>
+    </div>
+    <div class="metric-card metric-amber">
+      <div class="metric-label">Anxiety</div>
+      <div class="metric-value">3.2<sup>/ 10</sup></div>
+      <div class="metric-delta delta-up">Low this week</div>
+    </div>
+    <div class="metric-card metric-coral">
+      <div class="metric-label">Check-ins</div>
+      <div class="metric-value">6<sup>/ 7</sup></div>
+      <div class="metric-delta delta-neutral">Missed Tuesday</div>
+    </div>
+  </div>
+ 
+  <!-- CHARTS -->
+  <div class="main-grid">
+    <div class="card" id="sec-mood">
+      <div class="card-label">Mood this week</div>
+      <div id="mood-bars"></div>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-dot" style="background:#5dba82;"></span>Mood</div>
+        <div class="legend-item"><span class="legend-dot" style="background:#4a9edd;"></span>Sleep (scaled)</div>
+      </div>
+    </div>
+    <div class="card" id="sec-radar">
+      <div class="card-label">Dimension balance</div>
+      <div style="position:relative;height:220px;">
+        <canvas id="radarChart" role="img" aria-label="Radar chart showing sleep 6.9, mood 6.8, energy 5.5, social 7, calm 6.8 versus last week"></canvas>
+      </div>
+    </div>
+  </div>
+ 
+  <!-- LOWER -->
+  <div class="lower-grid">
+    <div class="card" id="sec-triggers">
+      <div class="card-label">Common triggers</div>
+      <div class="trigger-row"><span class="trigger-name">Work stress</span><span class="badge badge-amber">4 days</span></div>
+      <div class="trigger-row"><span class="trigger-name">Poor sleep</span><span class="badge badge-amber">3 days</span></div>
+      <div class="trigger-row"><span class="trigger-name">Exercise</span><span class="badge badge-green">helped</span></div>
+      <div class="trigger-row"><span class="trigger-name">Social time</span><span class="badge badge-green">helped</span></div>
+      <div class="trigger-row"><span class="trigger-name">Isolation</span><span class="badge badge-coral">1 day</span></div>
+    </div>
+    <div class="card" id="sec-checkin">
+      <div class="card-label">Log today</div>
+      <div class="checkin-row">
+        <div class="checkin-label">Mood (1–10)</div>
+        <div class="slider-wrap">
+          <input type="range" min="1" max="10" value="7" id="moodSlider">
+          <span class="slider-val" id="moodVal">7</span>
+        </div>
+      </div>
+      <div class="checkin-row">
+        <div class="checkin-label">Sleep (hrs)</div>
+        <div class="slider-wrap">
+          <input type="range" min="0" max="12" step="0.5" value="7" id="sleepSlider">
+          <span class="slider-val" id="sleepVal">7.0</span>
+        </div>
+      </div>
+      <div class="checkin-label" style="margin-top:4px;">How are you feeling?</div>
+      <div class="tag-list">
+        <span class="tag" onclick="toggleTag(this)">anxious</span>
+        <span class="tag" onclick="toggleTag(this)">calm</span>
+        <span class="tag" onclick="toggleTag(this)">tired</span>
+        <span class="tag" onclick="toggleTag(this)">energised</span>
+        <span class="tag" onclick="toggleTag(this)">sad</span>
+        <span class="tag" onclick="toggleTag(this)">grateful</span>
+        <span class="tag" onclick="toggleTag(this)">overwhelmed</span>
+      </div>
+      <button class="save-btn" onclick="saveMood()">Save check-in</button>
+    </div>
+  </div>
+ 
+  <!-- JOURNAL -->
+  <div class="card" style="margin-bottom:14px;animation:fadeUp 0.6s 0.35s ease both;" id="sec-journal">
+    <div class="card-label">Recent journal entries</div>
+    <div class="journal-grid">
+      <div class="journal-entry">
+        <div class="entry-mood-dot" style="background:#5dba82;"></div>
+        <div class="entry-date">THU, APR 24</div>
+        <div class="entry-text">Felt grounded after a walk. Work was hectic but I stayed present. Grateful for the evening quiet.</div>
+      </div>
+      <div class="journal-entry">
+        <div class="entry-mood-dot" style="background:#d4920a;"></div>
+        <div class="entry-date">WED, APR 23</div>
+        <div class="entry-text">Hard meeting drained me. Noticed chest tightness — took a break and breathed through it. Better by evening.</div>
+      </div>
+      <div class="journal-entry">
+        <div class="entry-mood-dot" style="background:#5dba82;"></div>
+        <div class="entry-date">MON, APR 21</div>
+        <div class="entry-text">Good start to the week. Called a friend and felt lighter. Sleep was short but felt rested somehow.</div>
+      </div>
+    </div>
+    <button class="add-entry-btn">＋ Add today's entry</button>
+  </div>
+ 
+  <!-- CALENDAR -->
+  <div class="card" style="animation:fadeUp 0.6s 0.4s ease both;" id="sec-calendar">
+    <div class="card-label">April at a glance</div>
+    <div class="cal-grid" id="cal"></div>
+    <div class="cal-legend">
+      <div class="cal-legend-item"><span class="cal-legend-sq" style="background:rgba(93,186,130,0.6);"></span>Good</div>
+      <div class="cal-legend-item"><span class="cal-legend-sq" style="background:rgba(212,146,10,0.6);"></span>Fair</div>
+      <div class="cal-legend-item"><span class="cal-legend-sq" style="background:rgba(217,96,74,0.6);"></span>Low</div>
+      <div class="cal-legend-item"><span class="cal-legend-sq" style="background:var(--surface2);border:1px solid var(--border);"></span>No log</div>
+    </div>
+  </div>
+ 
+</div><!-- /app -->
+</body>
+</html>
